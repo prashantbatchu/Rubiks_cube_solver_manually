@@ -583,7 +583,7 @@ vector<string> solve_middle_layer(Cube &cube){
                 if(top=='r') insert_green_red();
                 else insert_green_orange();
             }
-            else{
+            else if(front=='o'){
                 add("B2");
                 if(top=='b') insert_orange_blue();
                 else insert_orange_green();
@@ -610,7 +610,7 @@ vector<string> solve_middle_layer(Cube &cube){
                 if(top=='r') insert_green_red();
                 else insert_green_orange();
             }
-            else{
+            else if(front=='o'){
                 add("B'");
                 if(top=='b') insert_orange_blue();
                 else insert_orange_green();
@@ -636,7 +636,7 @@ vector<string> solve_middle_layer(Cube &cube){
                 if(top=='r') insert_green_red();
                 else insert_green_orange();
             }
-            else{
+            else if(front=='o'){
                 add("B");
                 if(top=='b') insert_orange_blue();
                 else insert_orange_green();
@@ -662,7 +662,7 @@ vector<string> solve_middle_layer(Cube &cube){
                 if(top=='r') insert_green_red();
                 else insert_green_orange();
             }
-            else{
+            else if(front=='o'){
                 // add("B2");
                 if(top=='b') insert_orange_blue();
                 else insert_orange_green();
@@ -674,8 +674,8 @@ vector<string> solve_middle_layer(Cube &cube){
                 !edgehas_yellow(cube.faces[2][1][0],cube.faces[4][0][1]) && 
                 !edgehas_yellow(cube.faces[3][1][0],cube.faces[4][2][1]) && 
                 !edgehas_yellow(cube.faces[3][1][2],cube.faces[5][2][1])){
-                     if(cube.faces[2][1][0]!=cube.faces[2][1][1] || cube.faces[5][0][1]!=cube.faces[5][1][1]) insert_red_green();
-            else if(cube.faces[2][1][2]!=cube.faces[2][1][1] || cube.faces[4][0][1]!=cube.faces[4][1][1]) insert_red_blue();
+                     if(cube.faces[2][1][2]!=cube.faces[2][1][1] || cube.faces[5][0][1]!=cube.faces[5][1][1]) insert_red_green();
+            else if(cube.faces[2][1][0]!=cube.faces[2][1][1] || cube.faces[4][0][1]!=cube.faces[4][1][1]) insert_red_blue();
             else if(cube.faces[3][1][0]!=cube.faces[3][1][1] || cube.faces[4][2][1]!=cube.faces[4][1][1]) insert_blue_orange();
             else if(cube.faces[3][1][2]!=cube.faces[3][1][1] || cube.faces[5][2][1]!=cube.faces[5][1][1]) insert_green_orange();
 
@@ -694,15 +694,288 @@ vector<string> solve_middle_layer(Cube &cube){
 
 vector<string> solve_yellow_cross(Cube &cube){
     // Implementation for solving the yellow cross
-    cout << "Solving yellow cross..." << endl;
     vector<string> solution;
-    // Add your algorithm here
+    auto add=[&](string m){ cube.applymove(m); solution.push_back(m); cout<<m<<" "; };
+    auto seq=[&](vector<string> moves){ for(auto &m:moves) add(m); };
+    cout << "Solving yellow cross..." << endl;
+    auto has_yellow =[&](char a){ return a=='y' ; };
+    auto crossyellow=[&](){
+        bool ok=true;
+        if(cube.faces[1][0][1]!=cube.faces[1][1][1] ||
+            cube.faces[1][1][0]!=cube.faces[1][1][1] ||
+            cube.faces[1][1][2]!=cube.faces[1][1][1] ||
+            cube.faces[1][2][1]!=cube.faces[1][1][1] ) ok=false;
+        
+        return ok;
+    };
+    while(!crossyellow()){
+        char e1 = cube.faces[1][0][1];
+        char e2 = cube.faces[1][1][0];
+        char e3 = cube.faces[1][2][1];
+        char e4 = cube.faces[1][1][2];
+        if(!has_yellow(e1) && !has_yellow(e2) && !has_yellow(e3) && !has_yellow(e4) ){
+            seq({"U","R","B","R'","B'","U'"});
+        }
+        else if(!has_yellow(e1)&&!has_yellow(e2)&&has_yellow(e3)&&has_yellow(e4)){
+            seq({"U","R","B","R'","B'","U'"});
+        }
+        else if(!has_yellow(e1)&&has_yellow(e2)&&has_yellow(e3)&&!has_yellow(e4)){
+            seq({"B'","U","R","B","R'","B'","U'"});
+        }
+        else if(has_yellow(e1)&&has_yellow(e2)&&!has_yellow(e3)&&!has_yellow(e4)){
+            seq({"B2","U","R","B","R'","B'","U'"});
+        }
+        else if(has_yellow(e1)&&!has_yellow(e2)&&!has_yellow(e3)&&has_yellow(e4)){
+            seq({"B","U","R","B","R'","B'","U'"});
+        }
+        else if(!has_yellow(e1)&&has_yellow(e2)&&!has_yellow(e3)&&has_yellow(e4)){
+            seq({"U","R","B","R'","B'","U'"});
+        }
+        else if(has_yellow(e1)&&!has_yellow(e2)&&has_yellow(e3)&&!has_yellow(e4)){
+            seq({"B","U","R","B","R'","B'","U'"});
+        }
+    }
+    cout<<endl;
+
     return solution;
 }
 vector<string> solve_yellow_corners(Cube &cube){
     // Implementation for solving the yellow corners
     cout << "Solving yellow corners..." << endl;
     vector<string> solution;
+    auto add=[&](string m){ cube.applymove(m); solution.push_back(m); cout<<m<<" "; };
+    auto seq=[&](vector<string> moves){ for(auto &m:moves) add(m); };
+
+    auto issolved=[&](){
+        bool ok=false;
+        if((cube.faces[2][0][1]=='r' && cube.faces[5][1][2]=='g'   && cube.faces[3][2][1]=='o' && cube.faces[4][1][0]=='b') ||
+            (cube.faces[2][0][1]=='g' && cube.faces[5][1][2]=='o'   && cube.faces[3][2][1]=='b' && cube.faces[4][1][0]=='r') ||
+            (cube.faces[2][0][1]=='o' && cube.faces[5][1][2]=='b'   && cube.faces[3][2][1]=='r' && cube.faces[4][1][0]=='g') ||
+            (cube.faces[2][0][1]=='b' && cube.faces[5][1][2]=='r'   && cube.faces[3][2][1]=='g' && cube.faces[4][1][0]=='o') ) ok=true;
+        
+        return ok;
+    };
+
+    
+    while(!issolved()){
+        
+        char rs = cube.faces[2][0][1];
+        char bs = cube.faces[4][1][0];
+        char gs = cube.faces[5][1][2];
+        char os = cube.faces[3][2][1];
+        if((rs=='r' && os=='o') || (rs=='o' && os=='r') || (bs=='o' && gs=='r') || gs=='o' && bs=='r'){
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(rs=='r' && gs=='g'){
+            seq({"B2"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(gs=='r' && os=='g'){
+            seq({"B'"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(os=='r' && bs=='g'){
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(bs=='r' && rs=='g'){
+            seq({"B"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(rs=='g' && gs=='o'){
+            seq({"B2"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(gs=='g' && os=='o'){
+            seq({"B'"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(os=='g' && bs=='o'){
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(bs=='g' && rs=='o'){
+            seq({"B"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(rs=='o' && gs=='b'){
+            seq({"B2"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(gs=='o' && os=='b'){
+            seq({"B'"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(os=='o' && bs=='b'){
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(bs=='o' && rs=='b'){
+            seq({"B"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(rs=='b' && gs=='r'){
+            seq({"B2"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(gs=='b' && os=='r'){
+            seq({"B'"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(os=='b' && bs=='r'){
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(bs=='b' && rs=='r'){
+            seq({"B"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        
+    }
+    // cout<<endl;
+    // cube.display();
+    // while(cube.faces[2][0][1]!=cube.faces[2][1][1]) seq({"B"});
+    auto issettled=[&](){
+        char rs = cube.faces[2][0][1];
+        char gs = cube.faces[5][1][2];
+        char os = cube.faces[3][2][1];
+        char bs = cube.faces[4][1][0];
+
+        string act_c1 = string() + rs + gs + cube.faces[1][1][1];
+        string act_c2 = string() + os + gs + cube.faces[1][1][1];
+        string act_c3 = string() + os + bs + cube.faces[1][1][1];
+        string act_c4 = string() + rs + bs + cube.faces[1][1][1];
+        sort(act_c1.begin(),act_c1.end());
+        sort(act_c2.begin(),act_c2.end());
+        sort(act_c3.begin(),act_c3.end());
+        sort(act_c4.begin(),act_c4.end());
+        
+        char c11 = cube.faces[2][0][2];
+        char c12 = cube.faces[1][0][0];
+        char c13 = cube.faces[5][0][2];
+        string c1 = string() + c11 + c12 + c13;
+        sort(c1.begin(),c1.end());
+
+        char c21 = cube.faces[1][2][0];
+        char c22 = cube.faces[3][2][2];
+        char c23 = cube.faces[5][2][2];
+        string c2 = string() + c21 + c22 + c23;
+        sort(c2.begin(),c2.end());
+
+
+        char c31 = cube.faces[1][2][2];
+        char c32 = cube.faces[3][2][0];
+        char c33 = cube.faces[4][2][0];
+        string c3 = string() + c31 + c32 + c33;
+        sort(c3.begin(),c3.end());
+
+
+        char c41 = cube.faces[2][0][0];
+        char c42 = cube.faces[1][0][2];
+        char c43 = cube.faces[4][0][0];
+        string c4 = string() + c41 + c42 + c43;
+        sort(c4.begin(),c4.end());
+
+
+        if(act_c1==c1 && act_c2==c2 && act_c3==c3 && act_c4==c4) return true;
+        return false;
+    };
+
+    while(!issettled()){
+        char rs = cube.faces[2][0][1];
+        char gs = cube.faces[5][1][2];
+        char os = cube.faces[3][2][1];
+        char bs = cube.faces[4][1][0];
+
+        string act_c1 = string() + rs + gs + cube.faces[1][1][1];
+        string act_c2 = string() + os + gs + cube.faces[1][1][1];
+        string act_c3 = string() + os + bs + cube.faces[1][1][1];
+        string act_c4 = string() + rs + bs + cube.faces[1][1][1];
+        sort(act_c1.begin(),act_c1.end());
+        sort(act_c2.begin(),act_c2.end());
+        sort(act_c3.begin(),act_c3.end());
+        sort(act_c4.begin(),act_c4.end());
+        
+        char c11 = cube.faces[2][0][2];
+        char c12 = cube.faces[1][0][0];
+        char c13 = cube.faces[5][0][2];
+        string c1 = string() + c11 + c12 + c13;
+        sort(c1.begin(),c1.end());
+
+        char c21 = cube.faces[2][0][2];
+        char c22 = cube.faces[3][2][2];
+        char c23 = cube.faces[5][2][2];
+        string c2 = string() + c21 + c22 + c23;
+        sort(c2.begin(),c2.end());
+
+
+        char c31 = cube.faces[2][0][2];
+        char c32 = cube.faces[3][2][0];
+        char c33 = cube.faces[4][2][0];
+        string c3 = string() + c31 + c32 + c33;
+        sort(c3.begin(),c3.end());
+
+
+        char c41 = cube.faces[2][0][0];
+        char c42 = cube.faces[1][2][2];
+        char c43 = cube.faces[4][0][0];
+        string c4 = string() + c41 + c42 + c43;
+        sort(c4.begin(),c4.end());
+
+        if(act_c1==c1){
+            seq({"L'","B","R","B'","L","B","R'","B'"});
+        }
+        else if(act_c2==c2){
+            seq({"B"});
+            seq({"L'","B","R","B'","L","B","R'","B'"});
+        }
+        else if(act_c3==c3){
+            seq({"B2"});
+            seq({"L'","B","R","B'","L","B","R'","B'"});
+        }
+        else if(act_c4==c4){
+            seq({"B'"});
+            seq({"L'","B","R","B'","L","B","R'","B'"});
+        }
+        else {
+            seq({"L'","B","R","B'","L","B","R'","B'"});
+        }
+    }
+
+cout<<endl;
+
+    while(1){
+        char cy1 = cube.faces[1][0][0];
+        char cy2 = cube.faces[1][2][0];
+        char cy3 = cube.faces[1][2][2];
+        char cy4 = cube.faces[1][0][2];
+        if(cy1!='y'){
+            if(cube.faces[2][0][2]=='y')seq({"R'","F","R","F'","R'","F","R","F'"});
+            else seq({"R'","F","R","F'","R'","F","R","F'","R'","F","R","F'","R'","F","R","F'"});
+        }
+        else if(cy2!='y'){
+            seq({"B"});
+            if(cube.faces[2][0][2]=='y')seq({"R'","F","R","F'","R'","F","R","F'"});
+            else seq({"R'","F","R","F'","R'","F","R","F'","R'","F","R","F'","R'","F","R","F'"});
+        }
+        else if(cy3!='y'){
+            seq({"B2"});
+            if(cube.faces[2][0][2]=='y')seq({"R'","F","R","F'","R'","F","R","F'"});
+            else seq({"R'","F","R","F'","R'","F","R","F'","R'","F","R","F'","R'","F","R","F'"});
+        }
+        else if(cy4!='y'){
+            seq({"B'"});
+            if(cube.faces[2][0][2]=='y')seq({"R'","F","R","F'","R'","F","R","F'"});
+            else seq({"R'","F","R","F'","R'","F","R","F'","R'","F","R","F'","R'","F","R","F'"});
+        }
+        if(cy1=='y' &&cy2=='y' &&cy3=='y' &&cy4=='y') break;
+    }
+    while(cube.faces[2][0][1]!=cube.faces[2][1][1]) seq({"B"});
+
+
+
+
+
+
+
+
+    cout<<endl;
     // Add your algorithm here
     return solution;
 }
@@ -720,8 +993,11 @@ void solver(Cube &cube) {
     s2 = solve_white_corners(cube);
     cube.display();
     s3 = solve_middle_layer(cube);
-    // s4 = solve_yellow_cross(cube);
-    // s5 = solve_yellow_corners(cube);
+    cube.display();
+    s4 = solve_yellow_cross(cube);
+    cube.display();
+
+    s5 = solve_yellow_corners(cube);
 
     cube.display();
 }
