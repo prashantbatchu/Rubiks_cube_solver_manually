@@ -6,6 +6,11 @@ This solver displays the cube in the terminal using colored output and automatic
 ---
 
 
+
+## 🧩 Cube Solver Demo
+
+![Demo of solving cube](assets/Screen%20Recording%202026-01-07%20193304.mp4)
+
 ## ✨ Features
 
 - 🎨 **Colored cube display** in terminal using ANSI escape codes  

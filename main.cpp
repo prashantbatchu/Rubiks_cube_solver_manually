@@ -1041,7 +1041,6 @@ int main() {
     std::string input =
         "wwwwwwwwwyyyyyyyyyrrrrrrrrr"
         "ooooooooobbbbbbbbbggggggggg";
-        // "wwwwwwwwwyygyyoggyyrbrrrrrroooooooyrobbybbbbbggrggbggy";
 
     Cube cube;
     cube_input(cube, input);

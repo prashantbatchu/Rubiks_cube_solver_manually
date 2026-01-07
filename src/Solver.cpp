@@ -90,6 +90,72 @@ vector<string> solve_white_cross(Cube &cube){
 }
 
 
+vector<string> reversePattern(const vector<string>& p) {
+    vector<string> r = p;
+    reverse(r.begin(), r.end());
+    return r;
+}
+
+
+bool matches(const vector<string>& v, int start,
+             const vector<string>& pattern, int times) {
+    int len = pattern.size();
+    if (start + len * times > (int)v.size()) return false;
+
+    for (int t = 0; t < times; t++) {
+        for (int j = 0; j < len; j++) {
+            if (v[start + t * len + j] != pattern[j])
+                return false;
+        }
+    }
+    return true;
+}
+
+
+
+void compressMoves(vector<string>& moves) {
+
+    vector<vector<string>> patterns = {
+        {"R","B","R'","B'"},
+        {"U","B","U'","B'"},
+        {"L","B","L'","B'"},
+        {"D","B","D'","B'"}
+    };
+
+    for (int i = 0; i < (int)moves.size(); ) {
+        bool changed = false;
+
+        for (auto& pat : patterns) {
+
+            // Rule 1: 6 repetitions → delete
+            if (matches(moves, i, pat, 6)) {
+                moves.erase(
+                    moves.begin() + i,
+                    moves.begin() + i + 6 * pat.size()
+                );
+                changed = true;
+                break;
+            }
+
+            // Rule 2: 5 repetitions → replace with reverse
+            if (matches(moves, i, pat, 5)) {
+                auto rev = reversePattern(pat);
+                moves.erase(
+                    moves.begin() + i,
+                    moves.begin() + i + 5 * pat.size()
+                );
+                moves.insert(moves.begin() + i, rev.begin(), rev.end());
+                changed = true;
+                break;
+            }
+        }
+
+        if (!changed) i++; 
+    }
+}
+
+
+
 vector<string> solve_white_corners(Cube &cube){
     cout << "Solving white corners (orientation + placement)..." << endl;
     vector<string> sol;
@@ -173,8 +239,9 @@ vector<string> solve_white_corners(Cube &cube){
        }
     }
     while(cube.faces[2][2][1]!=cube.faces[2][1][1])seq({"F"});
-
+    compressMoves(sol);
     cout << endl;
+
     if(cornersAligned())
         cout << "White corners oriented & correctly placed in " << sol.size() << " moves.\n";
     else
@@ -384,12 +451,17 @@ vector<string> solve_yellow_cross(Cube &cube){
         }
     }
     cout<<endl;
+    if(crossyellow()){
+        cout << " Last layer cross solved in " << solution.size() << " moves." << endl;
+    } else {
+        cout << " Failed to complete within limit. Progress " << endl;
+    }
 
     return solution;
 }
 vector<string> solve_yellow_corners(Cube &cube){
     // Implementation for solving the yellow corners
-    cout << "Solving yellow corners..." << endl;
+    cout << "Solving yellow midpieces..." << endl;
     vector<string> solution;
     auto add=[&](string m){ cube.applymove(m); solution.push_back(m); cout<<m<<" "; };
     auto seq=[&](vector<string> moves){ for(auto &m:moves) add(m); };
@@ -411,8 +483,18 @@ vector<string> solve_yellow_corners(Cube &cube){
         char bs = cube.faces[4][1][0];
         char gs = cube.faces[5][1][2];
         char os = cube.faces[3][2][1];
-        if((rs=='r' && os=='o') || (rs=='o' && os=='r') || (bs=='o' && gs=='r') || gs=='o' && bs=='r'){
+        if((rs=='r' && os=='o')){
             seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(rs=='o' && os=='r'){
+            seq({"B2"});
+            seq({"R","B","B","R'","B'","R","B'","R'"});
+        }
+        else if(rs=='b' && os=='g'){
+            seq({"B"});
+        }
+        else if(rs=='g' && os=='b'){
+            seq({"B"});
         }
         else if(rs=='r' && gs=='g'){
             seq({"B2"});
@@ -476,9 +558,8 @@ vector<string> solve_yellow_corners(Cube &cube){
         }
         
     }
-    // cout<<endl;
-    // cube.display();
-    // while(cube.faces[2][0][1]!=cube.faces[2][1][1]) seq({"B"});
+
+    cout << endl << "Solving yellow corners..." << endl;
     auto issettled=[&](){
         char rs = cube.faces[2][0][1];
         char gs = cube.faces[5][1][2];
@@ -546,14 +627,14 @@ vector<string> solve_yellow_corners(Cube &cube){
         string c1 = string() + c11 + c12 + c13;
         sort(c1.begin(),c1.end());
 
-        char c21 = cube.faces[2][0][2];
+        char c21 = cube.faces[1][2][0];
         char c22 = cube.faces[3][2][2];
         char c23 = cube.faces[5][2][2];
         string c2 = string() + c21 + c22 + c23;
         sort(c2.begin(),c2.end());
 
 
-        char c31 = cube.faces[2][0][2];
+        char c31 = cube.faces[1][2][2];
         char c32 = cube.faces[3][2][0];
         char c33 = cube.faces[4][2][0];
         string c3 = string() + c31 + c32 + c33;
@@ -561,7 +642,7 @@ vector<string> solve_yellow_corners(Cube &cube){
 
 
         char c41 = cube.faces[2][0][0];
-        char c42 = cube.faces[1][2][2];
+        char c42 = cube.faces[1][0][2];
         char c43 = cube.faces[4][0][0];
         string c4 = string() + c41 + c42 + c43;
         sort(c4.begin(),c4.end());
@@ -624,6 +705,11 @@ cout<<endl;
 
 
     cout<<endl;
+    if(issettled()){
+        cout << " Last layer solved in " << solution.size() << " moves." << endl;
+    } else {
+        cout << " Failed to complete within limit. Progress " << endl;
+    }
     // Add your algorithm here
     return solution;
 }
@@ -637,15 +723,23 @@ void solver(Cube &cube) {
     vector<string> s1, s2, s3, s4, s5;
     s1 = solve_white_cross(cube);
     cube.display();
-
     s2 = solve_white_corners(cube);
     cube.display();
     s3 = solve_middle_layer(cube);
     cube.display();
     s4 = solve_yellow_cross(cube);
     cube.display();
-
     s5 = solve_yellow_corners(cube);
-
     cube.display();
+    int sum = s1.size()+s2.size()+s3.size()+s4.size()+s5.size(); 
+
+    cout << "*********** White cross solved in " << s1.size() << " moves. *****************" << endl;
+    cout << "*********** White corners solved in " << s2.size() << " moves. ***************" << endl;
+    cout << "*********** Middle layer solved in " << s3.size() << " moves. ****************" << endl;
+    cout << "*********** Third layer cross solved in " << s4.size() << " moves. ***********" << endl;
+    cout << "*********** Last layer solved in " << s5.size() << " moves. ******************" << endl <<endl;
+    cout << "*********** Full cube solves in " << sum << " moves. ******************" <<endl; 
+
+
+
 }
