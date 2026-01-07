@@ -1,37 +1,28 @@
-#include "cube.hpp"
+#include "Cube.hpp"
+#include "Utils.hpp"
+#include <iostream>
+#include <cstdlib>
+using namespace std;
 
 
-/*
-0-white
-1-yellow
-2-red
-3-orange
-4-blue
-5-green
-
- */
-//      red 
-// blue white green yellow
-//      orange
-
-#define r "\033[41m  \033[0m"
-#define g "\033[42m  \033[0m"
-#define b "\033[44m  \033[0m"
-#define y "\033[43m  \033[0m"
-#define w "\033[47m  \033[0m"
-#define o "\033[48;2;255;165;0m  \033[0m"
-
-string getColor(char c){
-    switch(c){
-        case 'r': case 'R': return r;
-        case 'g': case 'G': return g;
-        case 'b': case 'B': return b;
-        case 'y': case 'Y': return y;
-        case 'w': case 'W': return w;
-        case 'o': case 'O': return o;
+void rotate_face_cw(vector<vector<char>> &face){
+    vector<vector<char>>T=face;
+    for(int i=0;i<3;i++){
+        for(int j=0;j<3;j++){
+            face[j][2-i] = T[i][j];
+        }
     }
-    return "  ";
 }
+
+void rotator_x(vector<char> &temp,int e1,int e2,int e3,int e4,int idx,vector<vector<char>> faces[6]){
+    for(int i=0;i<3;i++) faces[e1][idx][i] = faces[e2][idx][i];
+    for(int i=0;i<3;i++) faces[e2][idx][i] = faces[e3][idx][i];
+    for(int i=0;i<3;i++) faces[e3][idx][i] = faces[e4][idx][i];
+    for(int i=0;i<3;i++) faces[e4][idx][i] = temp[i];
+
+}
+
+
 
 Cube::Cube(){
     for(int i=0;i<6;i++){
@@ -57,23 +48,6 @@ void Cube::display(){
         cout<< endl;
     }
     cout<<endl;
-}
-
-void rotate_face_cw(vector<vector<char>> &face){
-    vector<vector<char>>T=face;
-    for(int i=0;i<3;i++){
-        for(int j=0;j<3;j++){
-            face[j][2-i] = T[i][j];
-        }
-    }
-}
-
-void rotator_x(vector<char> &temp,int e1,int e2,int e3,int e4,int idx,vector<vector<char>> faces[6]){
-    for(int i=0;i<3;i++) faces[e1][idx][i] = faces[e2][idx][i];
-    for(int i=0;i<3;i++) faces[e2][idx][i] = faces[e3][idx][i];
-    for(int i=0;i<3;i++) faces[e3][idx][i] = faces[e4][idx][i];
-    for(int i=0;i<3;i++) faces[e4][idx][i] = temp[i];
-
 }
 
 void Cube::move_R(){
@@ -211,7 +185,7 @@ void Cube::applymove(string move){
 
 void Cube::shufflecube_random(int moves){
     vector<string> mooves={"R","L","U","D","F","B","R'","L'","U'","D'","F'","B'","R2","L2","U2","D2","F2","B2"};
-    srand(time(0));
+    
     for(int i=0;i<moves;i++){
         int idx = rand() % mooves.size();
         cout<< mooves[idx] << " ";
@@ -219,22 +193,4 @@ void Cube::shufflecube_random(int moves){
     }
     cout<<endl;
 }
-
-// int main(){
-//     return 0;
-// }
-/*
-input string format:
-front back top bottom left right 
-3x3
-colours represented as single characters
-w - white
-y - yellow  
-r - red
-o - orange  
-b - blue
-g - green
-format example:
-wwwwwwwwwyyyyyyyyyrrrrrrrrroooooooooobbbbbbbbggggggggg
-*/
 

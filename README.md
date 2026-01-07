@@ -5,17 +5,24 @@ This solver displays the cube in the terminal using colored output and automatic
 
 ---
 
-## 🚀 Features
 
-✔ Full cube simulation (all 18 moves: R L U D F B + inverses + double turns)  
-✔ Colored terminal display using ANSI color codes  
-✔ Random shuffle generator  
-✔ Complete solving pipeline (White Cross → Corners → Middle Layer → Yellow Cross → Yellow Corners → PLL)  
-✔ Step-by-step printed moves  
-✔ Custom algorithms adapted to this cube orientation  
-✔ IDDFS (Iterative Deepening DFS) for optimal white cross
+## ✨ Features
 
----
+- 🎨 **Colored cube display** in terminal using ANSI escape codes  
+- 🔀 **Random cube shuffling**
+- 🔁 Supports all standard cube moves:
+  - `R L U D F B`
+  - Inverse moves: `R' L' U' D' F' B'`
+  - Double moves: `R2 L2 U2 D2 F2 B2`
+- 🧠 **Automatic solver** with the following stages:
+  1. White Cross (IDDFS + heuristic)
+  2. White Corners
+  3. Middle Layer
+  4. Yellow Cross
+  5. Yellow Corners
+- 🧱 **Fully object-oriented design**
+- 📦 Modular file structure (`.hpp` and `.cpp`)
+
 
 ## 🧠 Algorithms Implemented
 
