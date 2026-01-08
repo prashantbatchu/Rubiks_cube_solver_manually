@@ -9,7 +9,7 @@ This solver displays the cube in the terminal using colored output and automatic
 
 ## 🧩 Cube Solver Demo
 
-![Demo of solving cube](assets/Screen%20Recording%202026-01-07%20193304.mp4)
+![Demo of solving cube](assets/demo.gif)
 
 ## ✨ Features
 
@@ -99,13 +99,32 @@ Cube solved!
 ## 📂 Project Structure
 
 ```
-main.cpp
-Cube class
-Solver logic
-README.md
-```
+CUBE/
+│
+├── .vscode/                 # VS Code configuration files
+│
+├── assets/                  # Assets (screenshots, recordings, etc.)
+│   └── Screen Recording 2026-01-07 193304.mp4
+│
+├── include/                 # Header files
+│   ├── Cube.hpp
+│   ├── Solver.hpp
+│   └── Utils.hpp
+│
+├── src/                     # Source files
+│   ├── Cube.cpp
+│   ├── Solver.cpp
+│   └── Utils.cpp
+│
+├── .gitignore               # Git ignore rules
+├── cube.exe                 # Compiled executable (Windows)
+├── main.cpp                 # Program entry point
+└── README.md                # Project documentation
 
 ---
+### Folder Overview
 
-## 📄 License
-MIT License
+- **include/**: Contains all header files
+- **src/**: Contains implementation (.cpp) files
+- **assets/**: Media files related to the project
+- **main.cpp**: Entry point of the application
